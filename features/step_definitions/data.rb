@@ -6,6 +6,10 @@ Given /^a grid size of (\d+) meters$/ do |meters|
   set_grid_size meters
 end
 
+Given /^the import format \.(\w+)$/ do |format|
+  set_import_format format
+end
+
 Given /^the shortcuts$/ do |table|
   table.hashes.each do |row|
     shortcuts_hash[ row['key'] ] = row['value']

@@ -15,6 +15,7 @@ WAY_SPACING = 100
 DEFAULT_GRID_SIZE = 100   #meters
 PROFILES_PATH = '../profiles'
 BIN_PATH = '../build'
+DEFAULT_IMPORT_FORMAT = 'osm'
 
 ORIGIN = [1,1]
 
@@ -36,6 +37,14 @@ def set_grid_size meters
   #see ApproximateDistance() in ExtractorStructs.h
   #it's only accurate when measuring along the equator, or going exactly north-south
   @zoom = meters.to_f*0.8990679362704610899694577444566908445396483347536032203503E-5
+end
+
+def set_import_format format
+  if ['pbf','osm'].include? format
+    @import_format = format
+  else
+    raise "*** invalid import format '.#{format}', must be either .osm or .pbf"
+  end
 end
 
 def build_ways_from_table table
@@ -242,7 +251,7 @@ def write_timestamp
 end
 
 def reprocess
-  use_pbf = true
+  use_pbf = (@import_format == 'pbf')
   Dir.chdir TEST_FOLDER do
     write_osm
     write_timestamp
