@@ -68,7 +68,7 @@ void DescriptionFactory::SetStartSegment(const PhantomNode & start) {
     );
 }
 
-void DescriptionFactory::SetEndSegment(const PhantomNode & target) {
+void DescriptionFactory::SetEndOfPath(const PhantomNode & target) {
     target_phantom = target;
     pathDescription.push_back(
         SegmentInformation(
@@ -76,7 +76,20 @@ void DescriptionFactory::SetEndSegment(const PhantomNode & target) {
             target.nodeBasedEdgeNameID,
             0,
             target.weight1,
+            TurnInstructions.ReachedYourDestination,
+            true
+        )
+    );
+}
+void DescriptionFactory::SetEndOfLeg(const PhantomNode & target) {
+    target_phantom = target;
+    pathDescription.push_back(
+        SegmentInformation(
+            target.location,
+            target.nodeBasedEdgeNameID,
             0,
+            target.weight1,
+            TurnInstructions.ReachViaPoint,
             true
         )
     );

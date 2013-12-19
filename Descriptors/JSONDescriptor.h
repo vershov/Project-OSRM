@@ -101,7 +101,7 @@ public:
             description_factory.AppendSegment(current_coordinate, path_data );
             ++added_element_count;
         }
-        // description_factory.SetEndSegment( leg_phantoms.targetPhantom );
+        description_factory.SetEndOfLeg( leg_phantoms.targetPhantom );
         ++added_element_count;
         BOOST_ASSERT( (unsigned)(route_leg.size() + 1) == added_element_count );
         return added_element_count;
@@ -135,7 +135,10 @@ public:
                     added_segments + shortest_leg_end_indices.back()
                 );
             }
-            description_factory.SetEndSegment(phantom_nodes.targetPhantom);
+            // hack
+            description_factory.pathDescription.back().turn_instruction = TurnInstructions.ReachedYourDestination;
+
+            // description_factory.SetEndOfLeg(phantom_nodes.targetPhantom);
             description_factory.Run(facade, config.zoom_level);
         } else {
             //We do not need to do much, if there is no route ;-)
@@ -200,7 +203,7 @@ public:
                 current = facade->GetCoordinateOfNode(path_data.node);
                 alternate_descriptionFactory.AppendSegment(current, path_data );
             }
-            alternate_descriptionFactory.SetEndSegment(phantom_nodes.targetPhantom);
+            alternate_descriptionFactory.SetEndOfPath(phantom_nodes.targetPhantom);
         }
         alternate_descriptionFactory.Run(facade, config.zoom_level);
 
@@ -425,6 +428,9 @@ public:
         std::string tmpDist, tmpLength, tmpDuration, tmpBearing, tmpInstruction;
         //Fetch data from Factory and generate a string from it.
         BOOST_FOREACH(const SegmentInformation & segment, description_factory.pathDescription) {
+            if(segment.turn_instruction == TurnInstructions.ReachedYourDestination ) {
+                continue;
+            }
         	TurnInstruction current_instruction = segment.turn_instruction & TurnInstructions.InverseAccessRestrictionFlag;
             entered_restricted_area_count += (current_instruction != segment.turn_instruction);
             if(TurnInstructions.TurnIsNecessary( current_instruction) ) {

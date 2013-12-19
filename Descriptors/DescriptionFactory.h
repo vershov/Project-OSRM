@@ -88,7 +88,8 @@ public:
     void AppendSegment(const FixedPointCoordinate & coordinate, const PathData & data);
     void BuildRouteSummary(const double distance, const unsigned time);
     void SetStartSegment(const PhantomNode & start_phantom);
-    void SetEndSegment(const PhantomNode & start_phantom);
+    void SetEndOfLeg(const PhantomNode & start_phantom);
+    void SetEndOfPath(const PhantomNode & start_phantom);
     void AppendEncodedPolylineString(
         const bool return_encoded,
         std::vector<std::string> & output
@@ -178,14 +179,16 @@ public:
         //    SimpleLogger().Write() << "#segs: " << pathDescription.size();
 
         //Post-processing to remove empty or nearly empty path segments
-        if(std::numeric_limits<double>::epsilon() > pathDescription.back().length) {
+        if( std::numeric_limits<double>::epsilon() > pathDescription.back().length &&
+            TurnInstructions.ReachViaPoint != pathDescription.back().turn_instruction
+        ) {
             //        SimpleLogger().Write() << "#segs: " << pathDescription.size() << ", last ratio: " << target_phantom.ratio << ", length: " << pathDescription.back().length;
             if(pathDescription.size() > 2){
                 pathDescription.pop_back();
                 pathDescription.back().necessary = true;
                 pathDescription.back().turn_instruction = TurnInstructions.NoTurn;
                 target_phantom.nodeBasedEdgeNameID = (pathDescription.end()-2)->name_id;
-                SimpleLogger().Write() << "Deleting last turn instruction";
+                // SimpleLogger().Write() << "Deleting last turn instruction";
             }
         } else {
             pathDescription[indexOfSegmentBegin].duration *= (1.-target_phantom.ratio);
@@ -197,7 +200,7 @@ public:
                 pathDescription[0].turn_instruction = TurnInstructions.HeadOn;
                 pathDescription[0].necessary = true;
                 start_phantom.nodeBasedEdgeNameID = pathDescription[0].name_id;
-                //            SimpleLogger().Write() << "Deleting first turn instruction, ratio: " << start_phantom.ratio << ", length: " << pathDescription[0].length;
+                // SimpleLogger().Write() << "Deleting first turn instruction, ratio: " << start_phantom.ratio << ", length: " << pathDescription[0].length;
             }
         } else {
             pathDescription[0].duration *= start_phantom.ratio;
