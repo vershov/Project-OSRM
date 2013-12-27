@@ -132,7 +132,7 @@ public:
                 );
                 BOOST_ASSERT( 0 < added_segments );
                 shortest_leg_end_indices.push_back(
-                    added_segments + shortest_leg_end_indices.back()
+                    added_segments + shortest_leg_end_indices.back()-1
                 );
             }
             // hack
