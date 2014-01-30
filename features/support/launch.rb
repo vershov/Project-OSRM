@@ -20,6 +20,7 @@ class OSRMLauncher
   private
 
   def self.load_data
+    self.osrm_up?
     puts '=== loading data'
     `#{BIN_PATH}/osrm-datastore #{@input_file}`
   end
@@ -45,7 +46,10 @@ class OSRMLauncher
 
   def self.osrm_up?
     if @@pid
-      `ps -o state -p #{@@pid}`.split[1].to_s =~ /^[DRST]/
+      s = `ps -o state -p #{@@pid} --no-headers`.strip
+      up = (s =~ /^[DRST]/) != nil
+      puts "=== osrm-routed, status pid #{@@pid}: #{s} (#{up ? 'up' : 'down'})"
+      up
     else
       false
     end
@@ -53,8 +57,9 @@ class OSRMLauncher
 
   def self.osrm_up
     return if self.osrm_up?
-    puts '=== launching osrm'
+    print '=== launching osrm... '
     @@pid = Process.spawn("#{BIN_PATH}/osrm-routed --sharedmemory=1 --port #{OSRM_PORT}",:out=>OSRM_ROUTED_LOG_FILE, :err=>OSRM_ROUTED_LOG_FILE)
+    puts "pid=#{@@pid}"
   end
 
   def self.osrm_down
